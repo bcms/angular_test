@@ -1,4 +1,4 @@
-import { TestBed, getTestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { LoginService } from './login.service';
@@ -12,10 +12,40 @@ const dummyUserAuthentication = <User>{
   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJwcm9maWxlIjp7IlBhaW5lbEEiOnRydWUsIlBhaW5lbEIiOmZhbHNlfX0.4Ee96WTCnno0LefvJOwbEOAA0XUNIl2-tSN7MLRu-Lo"
 };
 
+describe('LoginService_Create', () => {
+  beforeEach(() => TestBed.configureTestingModule({}));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [LoginService],
+    });
+
+    var store = {};
+    spyOn(localStorage, 'setItem').and.callFake(function (key, value) {
+      return store[key] = value + '';
+    });
+
+    spyOn(localStorage, 'getItem').and.callFake(function (key) {
+      return store[key];
+    });
+  });
+
+  it('should be created', () => {
+    localStorage.setItem('currentUser', JSON.stringify(dummyUserAuthentication));
+
+    const service: LoginService = TestBed.get(LoginService);
+
+    expect(service).toBeTruthy();
+    expect(service.currentUser).toBeTruthy();
+    expect(service.currentUserValue).toEqual(dummyUserAuthentication);
+  });
+});
+
+
 describe('LoginService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
-  let injector: TestBed;
   let service: LoginService;
   let httpMock: HttpTestingController;
 
@@ -25,9 +55,8 @@ describe('LoginService', () => {
       providers: [LoginService],
     });
 
-    injector = getTestBed();
-    service = injector.get(LoginService);
-    httpMock = injector.get(HttpTestingController);
+    service = TestBed.get(LoginService);
+    httpMock = TestBed.get(HttpTestingController);
 
     var store = {};
     spyOn(localStorage, 'setItem').and.callFake(function (key, value) {
@@ -35,44 +64,46 @@ describe('LoginService', () => {
     });
 
     spyOn(localStorage, 'getItem').and.callFake(function (key) {
-      console.log('bla');
-      console.log(localStorage);
       return store[key];
+    });
+
+    spyOn(localStorage, 'removeItem').and.callFake(function (key) {
+      return delete store[key]
     });
   });
 
   afterEach(() => {
     httpMock.verify();
-  });  
+  });
 
-  it('should be created', () => {
-    localStorage.setItem('currentUser', JSON.stringify(dummyUserAuthentication));
-    console.log(JSON.stringify(dummyUserAuthentication));
-    console.log(dummyUserAuthentication);
-    console.log(dummyUserAuthentication);
-    const service: LoginService = TestBed.get(LoginService);
+  it('login() should authenticate user', () => {
 
-    console.log(service.currentUserValue);
-    console.log(service.currentUserValue);
+    service.login("username", "password").subscribe((res) => {
+      expect(res).toEqual(dummyUserAuthentication);
+    });
 
-    expect(service).toBeTruthy();
-    expect(service.currentUser).toBeTruthy();
+    const req = httpMock.expectOne('https://api.brunodev.in/api/login/authenticate');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ username: 'username', password: "password" });
+
+    req.flush(dummyUserAuthentication);
+
+    expect(localStorage.getItem('currentUser')).toBe(JSON.stringify(dummyUserAuthentication));
     expect(service.currentUserValue).toEqual(dummyUserAuthentication);
   });
 
-  // it('login() should authenticate user', () => {
+  it('logout() should exit user', () => {
 
-  //   service.login("username", "password").subscribe((res) => {
-  //     // Note that we are expecting "transformed" response with "university" property
-  //     expect(res).toEqual(dummyUserAuthentication); 
-  //   });
+    localStorage.setItem('currentUser', JSON.stringify(dummyUserAuthentication));
 
-  //   const req = httpMock.expectOne('https://api.brunodev.in/api/login/authenticate');
-  //   expect(req.request.method).toBe('POST');
-  //   expect(req.request.body).toEqual({ username: 'username', password: "password" });
+    service.login("user1", "password1").subscribe();
 
-  //   req.flush(dummyUserAuthentication); 
+    const req = httpMock.expectOne('https://api.brunodev.in/api/login/authenticate');
+    req.flush(dummyUserAuthentication);
 
-  //   expect(localStorage.getItem('currentUser')).toBe(JSON.stringify(dummyUserAuthentication));
-  // });
+    service.logout();
+
+    expect(localStorage.getItem('currentUser')).toBeFalsy();
+    expect(service.currentUserValue).toBeFalsy();
+  });
 });

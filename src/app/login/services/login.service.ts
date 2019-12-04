@@ -9,7 +9,6 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class LoginService {
-
   private users: Array<User> = [
     //Painel A
     {
@@ -60,10 +59,14 @@ export class LoginService {
     return this.http.post<User>("https://api.brunodev.in/api/login/authenticate", { username: username, password: password })
       .pipe(map(user => {
         localStorage.setItem('currentUser', JSON.stringify(user));
-        //this.currentUserSubject.next(user);
+        this.currentUserSubject.next(user);
 
         return user;
       }));
   }
 
+  logout() {
+    localStorage.removeItem('currentUser');
+    this.currentUserSubject.next(null);
+  }
 }
