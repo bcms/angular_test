@@ -13,8 +13,6 @@ const dummyUserAuthentication = <User>{
 };
 
 describe('LoginService_Create', () => {
-  beforeEach(() => TestBed.configureTestingModule({}));
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -44,8 +42,6 @@ describe('LoginService_Create', () => {
 
 
 describe('LoginService', () => {
-  beforeEach(() => TestBed.configureTestingModule({}));
-
   let service: LoginService;
   let httpMock: HttpTestingController;
 
