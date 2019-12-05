@@ -5,7 +5,7 @@ import { LoginService } from './login.service';
 import { User } from '../models/user';
 import { UUID } from 'angular2-uuid';
 
-const dummyUserAuthentication = <User>{
+const dummyUser = <User>{
   id: UUID.UUID(),
   username: "user1",
   password: "password1",
@@ -30,13 +30,13 @@ describe('LoginService_Create', () => {
   });
 
   it('should be created', () => {
-    localStorage.setItem('currentUser', JSON.stringify(dummyUserAuthentication));
+    localStorage.setItem('currentUser', JSON.stringify(dummyUser));
 
     const service: LoginService = TestBed.get(LoginService);
 
     expect(service).toBeTruthy();
     expect(service.currentUser).toBeTruthy();
-    expect(service.currentUserValue).toEqual(dummyUserAuthentication);
+    expect(service.currentUserValue).toEqual(dummyUser);
   });
 });
 
@@ -75,27 +75,27 @@ describe('LoginService', () => {
   it('login() should authenticate user', () => {
 
     service.login("username", "password").subscribe((res) => {
-      expect(res).toEqual(dummyUserAuthentication);
+      expect(res).toEqual(dummyUser);
     });
 
     const req = httpMock.expectOne('https://api.brunodev.in/api/login/authenticate');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ username: 'username', password: "password" });
 
-    req.flush(dummyUserAuthentication);
+    req.flush(dummyUser);
 
-    expect(localStorage.getItem('currentUser')).toBe(JSON.stringify(dummyUserAuthentication));
-    expect(service.currentUserValue).toEqual(dummyUserAuthentication);
+    expect(localStorage.getItem('currentUser')).toBe(JSON.stringify(dummyUser));
+    expect(service.currentUserValue).toEqual(dummyUser);
   });
 
   it('logout() should exit user', () => {
 
-    localStorage.setItem('currentUser', JSON.stringify(dummyUserAuthentication));
+    localStorage.setItem('currentUser', JSON.stringify(dummyUser));
 
     service.login("user1", "password1").subscribe();
 
     const req = httpMock.expectOne('https://api.brunodev.in/api/login/authenticate');
-    req.flush(dummyUserAuthentication);
+    req.flush(dummyUser);
 
     service.logout();
 
