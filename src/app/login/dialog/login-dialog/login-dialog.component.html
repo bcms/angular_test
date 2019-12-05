@@ -1,38 +1,33 @@
-<div class="card">
-    <div class="card-body">
-
-        <form [formGroup]="loginForm" (ngSubmit)="login()">
-
-        <!-- (ngSubmit)="formatNames()" -->
-
-            <div class="form-group">
-                <label for="username">Usuário</label>
-                <input id="username" class="form-control"  formControlName="username" type="text" />
-                <!-- [ngClass]="{'is-invalid':authorForm.controls.amountOfNames.invalid }" -->
-                <!-- <div class="invalid-feedback" *ngIf="authorForm.controls.amountOfNames.invalid">
-                    Valor inválido (Número inteiro)
-                </div> -->
-            </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input id="password" class="form-control"  formControlName="password" type="password" />
-                <!-- [ngClass]="{'is-invalid':authorForm.controls.amountOfNames.invalid }" -->
-                <!-- <div class="invalid-feedback" *ngIf="authorForm.controls.amountOfNames.invalid">
-                    Valor inválido (Número inteiro)
-                </div> -->
-            </div>
-            <!-- <div class="form-group">
-                <label for="names">Nome dos autores</label>
-                <textarea id="names" class="form-control" [ngClass]="{ 'is-invalid': authorForm.controls.names.invalid }" formControlName="names" rows="10"
-                    placeholder="Por favor, insira um autor por linha">
-                </textarea>
-                <div class="invalid-feedback" *ngIf="authorForm.controls.names.invalid">
-                    Campo requerido.
-                </div>
-            </div> -->
-            <!-- <div class="col-xs-12">
-                <button class="btn btn-success" type="submit">Formatar nomes</button>
-            </div> -->
-        </form>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="modal-header">
+        <h4 class="modal-title">Entrar no sistema</h4>
+        <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-</div>
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="username">Usuário</label>
+            <input id="username" class="form-control" [class.is-invalid]="username.invalid && username.touched"
+                formControlName="username" type="text" autofocus />
+            <div id="username-msg" class="invalid-feedback username" *ngIf="username.invalid && username.touched">
+                Campo requerido.
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password">Senha</label>
+            <input id="password" class="form-control" [class.is-invalid]="password.invalid && password.touched"
+                formControlName="password" type="password" />
+            <div class="invalid-feedback" *ngIf="password.errors?.required && password.touched">
+                Campo requerido.
+            </div>
+            <div class="invalid-feedback" *ngIf="password.errors?.pattern && password.touched">
+                Senha deve conter no minimo 8 caracteres, uma letra maiuscula, uma letra minuscula, um número e um
+                caractere especial (!, @, #, $, %, ^, &, *).
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-success" type="submit">Entrar</button>
+    </div>
+</form>

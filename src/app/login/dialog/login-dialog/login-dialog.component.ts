@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-login-dialog',
@@ -11,15 +12,13 @@ import { LoginService } from '../../services/login.service';
 export class LoginDialogComponent implements OnInit {
 
   loginForm: FormGroup;
-  loading: boolean = false;
 
   constructor(
     private loginService: LoginService,
     private formBuilder: FormBuilder,
-    private router: Router
-  ) {
-    
-  }
+    private router: Router,
+    public activeModal: NgbActiveModal
+  ) { }
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -35,14 +34,16 @@ export class LoginDialogComponent implements OnInit {
 
   onSubmit() {
 
-    if (!this.loginForm.valid)
+    if (!this.loginForm.valid) {
+      this.loginForm.markAllAsTouched();
       return;
+    }
 
     this.loginService.login(this.username.value, this.password.value)
       .subscribe(
         data => {
           this.router.navigateByUrl('/');
-        }, 
+        },
         error => {
           alert('Usuário ou senha incorretos!');
         });

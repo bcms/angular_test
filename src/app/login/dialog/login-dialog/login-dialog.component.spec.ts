@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { User } from '../../models/user';
 import { LoginService } from '../../services/login.service';
+import { By } from '@angular/platform-browser';
+import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 const dummyUser = <User>{
   id: UUID.UUID(),
@@ -32,7 +34,8 @@ describe('LoginDialogComponent', () => {
       ],
       declarations: [LoginDialogComponent],
       providers: [
-        LoginService
+        LoginService,
+        NgbActiveModal 
       ]
     })
       .compileComponents();
@@ -48,6 +51,7 @@ describe('LoginDialogComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+    expect(component.activeModal).toBeTruthy();
   });
 
   it('empty form should be invalid', () => {
@@ -91,24 +95,26 @@ describe('LoginDialogComponent', () => {
     expect(errors['pattern']).toBeFalsy();
   });
 
-
   it('onSubmit() should validate and authenticate the user', () => {
 
     let loginService_loginSpy = spyOn(loginService, 'login').and.callThrough();
     let router_navigateByUrlSpy = spyOn(router, 'navigateByUrl').and.callThrough();
+    let loginForm_markAllAsTouchedSpy = spyOn(component.loginForm, 'markAllAsTouched').and.callThrough();
 
     let username = component.username
     let password = component.password
 
     //Usuário e senha vázios
     component.onSubmit();
-    expect(loginService_loginSpy).not.toHaveBeenCalled()
+    expect(loginService_loginSpy).not.toHaveBeenCalled();
+    expect(loginForm_markAllAsTouchedSpy).toHaveBeenCalledTimes(1);
 
     //Usuário e senha inválidos
     username.setValue('usuarioA');
     password.setValue('senha');
     component.onSubmit();
     expect(loginService_loginSpy).not.toHaveBeenCalled();
+    expect(loginForm_markAllAsTouchedSpy).toHaveBeenCalledTimes(2);
 
     //Usuário e senha válidos
     username.setValue('usuarioA');
@@ -117,6 +123,7 @@ describe('LoginDialogComponent', () => {
     component.onSubmit();
     expect(loginService_loginSpy).toHaveBeenCalledWith('usuarioA', 'Senha12*');
     expect(router_navigateByUrlSpy).toHaveBeenCalledWith('/');
+    expect(loginForm_markAllAsTouchedSpy).toHaveBeenCalledTimes(2);
 
     //Usuário não autenticado no serviço
     window.alert = jasmine.createSpy();
@@ -126,5 +133,7 @@ describe('LoginDialogComponent', () => {
     component.onSubmit();
     expect(loginService_loginSpy).toHaveBeenCalledWith('usuarioB', 'Senha44*');
     expect(window.alert).toHaveBeenCalledWith('Usuário ou senha incorretos!');
+    expect(loginForm_markAllAsTouchedSpy).toHaveBeenCalledTimes(2);
+
   });
 });
