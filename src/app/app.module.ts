@@ -8,12 +8,15 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { LoginDialogComponent } from './login/dialog/login-dialog/login-dialog.component';
+import { fakeBackendProvider } from './_helpers/fake-backend-interceptor';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    LoginDialogComponent
+    LoginDialogComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -23,7 +26,7 @@ import { LoginDialogComponent } from './login/dialog/login-dialog/login-dialog.c
     HttpClientModule,
     NgbModule
   ],
-  providers: [],
+  providers: [fakeBackendProvider],
   bootstrap: [AppComponent],
   entryComponents: [LoginDialogComponent]
 })

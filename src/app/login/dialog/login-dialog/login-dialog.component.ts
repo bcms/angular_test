@@ -42,7 +42,8 @@ export class LoginDialogComponent implements OnInit {
     this.loginService.login(this.username.value, this.password.value)
       .subscribe(
         data => {
-          this.router.navigateByUrl('/');
+          this.activeModal.dismiss();
+          this.router.navigate(['/home']);
         },
         error => {
           alert('Usuário ou senha incorretos!');

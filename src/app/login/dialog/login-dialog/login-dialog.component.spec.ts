@@ -98,8 +98,9 @@ describe('LoginDialogComponent', () => {
   it('onSubmit() should validate and authenticate the user', () => {
 
     let loginService_loginSpy = spyOn(loginService, 'login').and.callThrough();
-    let router_navigateByUrlSpy = spyOn(router, 'navigateByUrl').and.callThrough();
+    let router_navigateSpy = spyOn(router, 'navigate').and.callThrough();
     let loginForm_markAllAsTouchedSpy = spyOn(component.loginForm, 'markAllAsTouched').and.callThrough();
+    let lactiveModal_dismissSpy = spyOn(component.activeModal, 'dismiss').and.callThrough();
 
     let username = component.username
     let password = component.password
@@ -122,7 +123,8 @@ describe('LoginDialogComponent', () => {
     loginService_loginSpy.and.returnValue(of(dummyUser));
     component.onSubmit();
     expect(loginService_loginSpy).toHaveBeenCalledWith('usuarioA', 'Senha12*');
-    expect(router_navigateByUrlSpy).toHaveBeenCalledWith('/');
+    expect(router_navigateSpy).toHaveBeenCalledWith(['/home']);
+    expect(lactiveModal_dismissSpy).toHaveBeenCalledTimes(1);
     expect(loginForm_markAllAsTouchedSpy).toHaveBeenCalledTimes(2);
 
     //Usuário não autenticado no serviço
